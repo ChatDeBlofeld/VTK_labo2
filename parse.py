@@ -1,14 +1,19 @@
-
-
 import vtk
 import math
+from constants import *
+# pip install -r requirements.txt
+import numpy as np
+from skimage import measure, morphology
 
-
-# in [m]
-EARTH_RADIUS: int = 6371009
+def get_elevations_with_lakes(grid):
+    # BY THE POWER OF DATA SCIENCE [INSERT EXTREMELY VULGAR EXCLAMATION OF JOY OF YOUR CHOICE]
+    grid = grid.copy() # rip RAM
+    labels = measure.label(grid, connectivity=1)
+    mask = morphology.remove_small_objects(labels, MIN_LAKE_AREA) > 0
+    grid[mask] = LAKE_FAKE_ELEVATION
+    return grid
 
 def toCartesian(azimuth: float, inclination: float, elevation):
-    # x = r*sin(phi)*cos(theta), y = r*sin(phi)*sin(theta), z = r*cos(phi). 
     azimuth = math.radians(azimuth)
     inclination = math.radians(inclination)
     x = elevation * math.sin(inclination) * math.cos(azimuth)
@@ -23,41 +28,30 @@ def parse(filename: str, lat_begin: float, lat_end: float, lon_begin: float, lon
         azimuth_offset = (lon_end - lon_begin) / (cols - 1)
 
         points = vtk.vtkPoints()
-        for j in range(rows):
-            elevations = (int(x) for x in file.readline().strip().split(" "))
+        attributes = vtk.vtkIntArray()
+
+        raw_elevations = np.array([[int(x) for x in file.readline().strip().split(" ")] for i in range(rows)])
+        raw_elevations_with_lakes = get_elevations_with_lakes(raw_elevations)
+
+        for j, elevations in enumerate(raw_elevations):
             for i, elevation in enumerate(elevations):
-                # Missing elevation attribute somewhere
                 (x,y,z) = toCartesian(lon_begin + i * azimuth_offset, lat_begin + j * inclination_offset, EARTH_RADIUS + elevation)
                 points.InsertNextPoint(x , y, z)
+                attributes.InsertNextValue(raw_elevations_with_lakes[j,i])
 
         grid = vtk.vtkStructuredGrid()
         grid.SetDimensions(rows, cols, 1)
         grid.SetPoints(points)
+        grid.GetPointData().SetScalars(attributes)     
 
         return grid
 
 
-grid = parse("altitudes.txt", 45, 47.5, 5, 7.5)
+grid = parse(INPUT_FILE, *EARTH_AREA)
 
-mapper = vtk.vtkDataSetMapper()
-mapper.SetInputData(grid)
-
-gridActor = vtk.vtkActor()
-gridActor.SetMapper(mapper)
-
-renderer = vtk.vtkRenderer()
-renderer.AddActor(gridActor)
-renderer.SetBackground(0.1, 0.2, 0.4)
-
-renWin = vtk.vtkRenderWindow()
-renWin.AddRenderer(renderer)
-renWin.SetSize(300, 300)
-
-iren = vtk.vtkRenderWindowInteractor()
-iren.SetRenderWindow(renWin)
-
-style = vtk.vtkInteractorStyleTrackballCamera()
-iren.SetInteractorStyle(style)
-
-iren.Initialize()
-iren.Start()
+# Export grid
+writer = vtk.vtkStructuredGridWriter()
+writer.SetFileName(VTK_PRE_COMPUTED_FILE )
+writer.SetFileTypeToASCII()
+writer.SetInputData(grid)
+writer.Write()

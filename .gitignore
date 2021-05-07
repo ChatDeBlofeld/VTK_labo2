@@ -1,3 +1,5 @@
 .vscode
 metals.*
 settings.json
+__pycache__
+map.vtk
