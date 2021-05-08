@@ -28,3 +28,13 @@ Pour représenter la montée des eaux due au réchaufemment climatique, changer 
 ```
 python parse.py
 ```
+
+## Résulats
+
+### Vue standard
+
+![](./results/standard_view.png)
+
+### Niveau de la mer à 370m
+
+![](./results/global_warming.png)
