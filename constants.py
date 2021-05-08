@@ -14,10 +14,11 @@ EARTH_RADIUS: int = 6371009
 SEA_LEVEL: int = 0
 
 # in cells, don't know exactly which area it is, comes from trial and error
-MIN_LAKE_AREA: int = 200
+# (many glitches in the flat country of France)
+MIN_LAKE_AREA: int = 400
 
 # for usage in the transfer color function
-LAKE_FAKE_ELEVATION: int = -1
+LAKE_FAKE_ELEVATION: int = 0
 
 # elevation 0, lon 6.25 lat 46.25
 FOCAL_POINT = [501_025, 4_405_635, 4_574_833]
