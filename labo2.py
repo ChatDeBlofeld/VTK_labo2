@@ -1,31 +1,6 @@
 import vtk
 from constants import *
 
-def MakeLUTFromCTF(tableSize):
-    '''
-    Use a color transfer Function to generate the colors in the lookup table.
-    See: http://www.vtk.org/doc/nightly/html/classvtkColorTransferFunction.html
-    :param: tableSize - The table size
-    :return: The lookup table.
-    '''
-    ctf = vtk.vtkColorTransferFunction()
-    ctf.SetColorSpaceToDiverging()
-    # Green to tan.
-    ctf.AddRGBPoint(400, 0.085, 0.532, 0.201)
-    ctf.AddRGBPoint(700, 0.865, 0.865, 0.865)
-    ctf.AddRGBPoint(1000, 0.677, 0.492, 0.093)
-
-    lut = vtk.vtkLookupTable()
-    lut.SetNumberOfTableValues(tableSize)
-    lut.Build()
-
-    for i in range(0,tableSize):
-        rgb = list(ctf.GetColor(float(i)/tableSize))+[1]
-        lut.SetTableValue(i,rgb)
-
-    return lut
-
-
 # import stuff
 
 grid = vtk.vtkStructuredGrid()
@@ -38,8 +13,20 @@ reader.Update()
 
 # Display stuff
 
+
+# Our transfer function. It was quite a long process of trial and error 
+# to know how many points to add, at which elevations and especially 
+# which colors to choose but we really like the result.
+ctf = vtk.vtkColorTransferFunction()
+ctf.AddRGBPoint(0, 0.514, 0.49, 1)
+ctf.AddRGBPoint(1, 0.157, 0.325, 0.141)
+ctf.AddRGBPoint(400, 0.392, 0.725, 0.357)
+ctf.AddRGBPoint(800, 0.898, 0.784, 0.537)
+ctf.AddRGBPoint(1600, 1, 1, 1)
+
 mapper = vtk.vtkDataSetMapper()
 mapper.SetInputData(grid)
+mapper.SetLookupTable(ctf)
 
 gridActor = vtk.vtkActor()
 gridActor.SetMapper(mapper)
