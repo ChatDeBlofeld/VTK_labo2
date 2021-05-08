@@ -34,7 +34,6 @@ reader = vtk.vtkStructuredGridReader()
 reader.SetFileName(VTK_PRE_COMPUTED_FILE)
 reader.SetOutput(grid)
 reader.ReadAllScalarsOn()
-reader.ReadAllVectorsOn()
 reader.Update()
 
 # Display stuff
@@ -47,11 +46,13 @@ gridActor.SetMapper(mapper)
 
 renderer = vtk.vtkRenderer()
 renderer.AddActor(gridActor)
-renderer.SetBackground(0.1, 0.2, 0.4)
+renderer.GetActiveCamera().SetFocalPoint(*FOCAL_POINT)
+renderer.GetActiveCamera().SetPosition(*CAMERA_POSITION)
+renderer.GetActiveCamera().SetClippingRange(0.1, 1_000_000) 
 
 renWin = vtk.vtkRenderWindow()
 renWin.AddRenderer(renderer)
-renWin.SetSize(300, 300)
+renWin.SetSize(800, 800)
 
 iren = vtk.vtkRenderWindowInteractor()
 iren.SetRenderWindow(renWin)
@@ -60,4 +61,5 @@ style = vtk.vtkInteractorStyleTrackballCamera()
 iren.SetInteractorStyle(style)
 
 iren.Initialize()
+iren.Render()
 iren.Start()

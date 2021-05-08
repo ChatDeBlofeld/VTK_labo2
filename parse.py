@@ -27,9 +27,9 @@ def toCartesian(azimuth: float, inclination: float, elevation):
     '''
     azimuth = math.radians(azimuth)
     inclination = math.radians(inclination)
-    x = elevation * math.sin(inclination) * math.cos(azimuth)
-    y = elevation * math.sin(inclination) * math.sin(azimuth)
-    z = elevation * math.cos(inclination)
+    x = elevation * math.sin(inclination) * math.sin(azimuth)
+    y = elevation * math.cos(inclination)
+    z = elevation * math.sin(inclination) * math.cos(azimuth)
     return x,y,z
 
 def parse(filename: str, lat_begin: float, lat_end: float, lon_begin: float, lon_end: float):
