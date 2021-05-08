@@ -22,3 +22,9 @@ Pour visualiser le fichier généré :
 ```
 python labo2.py
 ```
+
+Pour représenter la montée des eaux due au réchaufemment climatique, changer la constante `SEA_LEVEL` dans le fichier `constants.py` et regénérer un fichier de données avec :
+
+```
+python parse.py
+```
