@@ -52,6 +52,6 @@ grid = parse(INPUT_FILE, *EARTH_AREA)
 # Export grid
 writer = vtk.vtkStructuredGridWriter()
 writer.SetFileName(VTK_PRE_COMPUTED_FILE )
-writer.SetFileTypeToASCII()
+writer.SetFileTypeToBinary()
 writer.SetInputData(grid)
 writer.Write()
